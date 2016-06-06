@@ -8,9 +8,8 @@ if [ -z $1 ]; then
 fi
 
 # set permanent $LOG file var
-# set per-job $LOG_XX file
-# set $LOG_LOCKED_ERR in case locking failed
 LOG="/var/log/crontab-nightlies-log/crontab.log"
+# set $LOG_LOCKED_ERR in case locking failed
 LOG_LOCK_ERR="/var/log/crontab-nightlies-log/crontab_lock_problem.$$"
 
 # temp files to store sdtout and stderr
@@ -44,12 +43,13 @@ else
         cat $STDOUT   >> $STDOUT
 fi
 
+
 # lock $LOG with file descriptor 200
 # if $LOC is locked by other process - wait for 20 sec
-# if lock failed, write to $LOG_LOCK_ERR, e.g. all information already in $LOG_XX
 exec 200>>$LOG
 flock -w 20 200 || LOG=$LOG_LOCK_ERR
-# write from per-job $LOG_XX file to the commonn $LOG
-cat $LOG_XX >> $LOG
-# unlock 
+cat $STDOUT >> $LOG
+# unlock
 flock -u 200
+
+exit 0
